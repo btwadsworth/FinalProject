@@ -33,6 +33,7 @@ public class FarkleGUI extends JFrame {
     public static HashMap<JCheckBox, JLabel> checkBoxes = new HashMap<>();
     private int turn = 1;
     private int TOTAL = 0;
+    private int ROLLTOTAL = 0;
     private int PLAYERONESCORE = 0;
     private int PLAYERTWOSCORE = 0;
 
@@ -87,42 +88,42 @@ public class FarkleGUI extends JFrame {
         chkBoxDiceOne.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
         chkBoxDiceTwo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
         chkBoxDiceThree.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
         chkBoxDiceFour.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
         chkBoxDiceFive.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
         chkBoxDiceSix.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                SetRunningTotal();
             }
         });
 
@@ -205,7 +206,19 @@ public class FarkleGUI extends JFrame {
                 roll++;
             }
         }
+    }
 
+    private void SetRunningTotal(){
+
+        int score = Scoring.RunningTotal();
+
+        if (score == -1)
+            JOptionPane.showMessageDialog(null, "One or more of the dice are not scoring.",
+                    "ERROR", JOptionPane.WARNING_MESSAGE);
+        else {
+            ROLLTOTAL = score;
+            lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
+        }
 
     }
 
