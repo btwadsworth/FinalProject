@@ -37,6 +37,9 @@ public class FarkleGUI extends JFrame {
     private int PLAYERONESCORE = 0;
     private int PLAYERTWOSCORE = 0;
 
+    protected static boolean VALID_DICE = true;
+
+
     public FarkleGUI() {
 
         setContentPane(mainPanel);
@@ -58,76 +61,56 @@ public class FarkleGUI extends JFrame {
         btnRollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int count = 6;
-                KeepDice();
-                for (JCheckBox box : checkBoxes.keySet()){
-                    if (box.isSelected())
-                        count--;
+                if (VALID_DICE) {
+                    int count = 6;
+                    KeepDice();
+                    for (JCheckBox box : checkBoxes.keySet()) {
+                        if (box.isSelected())
+                            count--;
+                    }
+                    SetDice(Roll.RollDice(count));
                 }
-                SetDice(Roll.RollDice(count));
+                else {
+                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
+                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
+                }
             }
         });
 
         btnBankPoints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ResetDice();
-                if (turn == 1)
-                    turn = 2;
-                else
-                    turn = 1;
-                for (JCheckBox box : checkBoxes.keySet()){  // Disable checkboxes because dice have not been rolled yet
-                    box.setEnabled(false);
+
+                if (VALID_DICE){
+
+                    ResetDice();
+                    if (turn == 1)
+                        turn = 2;
+                    else
+                        turn = 1;
+                    for (JCheckBox box : checkBoxes.keySet()){  // Disable checkboxes because dice have not been rolled yet
+                        box.setEnabled(false);
+                    }
+                    for (JLabel dice : checkBoxes.values()) {
+                        dice.setIcon(images.get(0));
+                    }
                 }
-                for (JLabel dice : checkBoxes.values()) {
-                    dice.setIcon(images.get(0));
+                else {
+                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
+                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
                 }
+
+
             }
         });
 
-        chkBoxDiceOne.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
+        for (JCheckBox box : checkBoxes.keySet()){
 
-        chkBoxDiceTwo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
-
-        chkBoxDiceThree.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
-
-        chkBoxDiceFour.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
-
-        chkBoxDiceFive.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
-
-        chkBoxDiceSix.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetRunningTotal();
-            }
-        });
-
-
+            box.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) { SetRunningTotal(); }
+            });
+        }
     }
 
     private void ResetDice() {
@@ -176,7 +159,6 @@ public class FarkleGUI extends JFrame {
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
         checkBoxes.put(chkBoxDiceOne, dice1);
         checkBoxes.put(chkBoxDiceTwo, dice2);
         checkBoxes.put(chkBoxDiceThree, dice3);
@@ -184,6 +166,7 @@ public class FarkleGUI extends JFrame {
         checkBoxes.put(chkBoxDiceFive, dice5);
         checkBoxes.put(chkBoxDiceSix, dice6);
     }
+
 
     private void AddPlayers() {
         // Get player names using JOptionPane.showInputDialog
@@ -213,9 +196,9 @@ public class FarkleGUI extends JFrame {
         int score = Scoring.RunningTotal();
 
         if (score == -1)
-            JOptionPane.showMessageDialog(null, "One or more of the dice are not scoring.",
-                    "ERROR", JOptionPane.WARNING_MESSAGE);
+            VALID_DICE = false;
         else {
+            VALID_DICE = true;
             ROLLTOTAL = score;
             lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
         }

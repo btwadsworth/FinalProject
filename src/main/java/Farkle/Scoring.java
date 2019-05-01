@@ -25,8 +25,6 @@ public class Scoring extends FarkleGUI {
 
         int total = 0;
 
-        String ONE = images.get(1).toString();
-
         ArrayList<Integer> diceValues = new ArrayList<>();
 
         for (JCheckBox box : checkBoxes.keySet()){
@@ -82,34 +80,38 @@ public class Scoring extends FarkleGUI {
                 }
             }
 
-            if ((0 < two && two < 3) || (0 < three && three < 3) || (0 < four && four < 3) || (0 < six && six < 3))
-                return -1;
-            else {
-                if (two >= 3)
-                    total += 200 * (two - 2);
-                if (three >= 3)
-                    total += 300 * (three - 2);
-                if (four >= 3)
-                    total += 400 * (four - 2);
-                if (six >= 3)
-                    total += 600 * (six - 2);
-
-                if (one < 3)
-                    total += 100 * one;
-                else
-                    total += 1000 * (one - 2);
-
-                if (five < 3)
-                    total += 50 * five;
-                else
-                    total += 500 * (five - 2);
-
-                return total;
+            if ((0 < two && two < 3) || (0 < three && three < 3) || (0 < four && four < 3) || (0 < six && six < 3)){
+                FarkleGUI.VALID_DICE = false;
+                System.out.println("Here");
+            } else {
+                FarkleGUI.VALID_DICE = true;
+                System.out.println("There");
             }
+
+
+            if (two >= 3)
+                total += 200 * (two - 2);
+            if (three >= 3)
+                total += 300 * (three - 2);
+            if (four >= 3)
+                total += 400 * (four - 2);
+            if (six >= 3)
+                total += 600 * (six - 2);
+
+            if (one < 3)
+                total += 100 * one;
+            else
+                total += 1000 * (one - 2);
+
+            if (five < 3)
+                total += 50 * five;
+            else
+                total += 500 * (five - 2);
+
+            return total;
+
         }
     }
-
-
 
 
 
