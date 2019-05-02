@@ -37,6 +37,10 @@ public class FarkleGUI extends JFrame {
     private int PLAYERONESCORE = 0;
     private int PLAYERTWOSCORE = 0;
 
+    private static final int INVALID_SCORE = -1;
+    private static final int TOTAL_DICE = 6;
+
+
     protected static boolean VALID_DICE = true;
 
 
@@ -61,8 +65,9 @@ public class FarkleGUI extends JFrame {
         btnRollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println(VALID_DICE);
                 if (VALID_DICE) {
-                    int count = 6;
+                    int count = TOTAL_DICE;
                     KeepDice();
                     for (JCheckBox box : checkBoxes.keySet()) {
                         if (box.isSelected())
@@ -193,15 +198,11 @@ public class FarkleGUI extends JFrame {
 
     private void SetRunningTotal(){
 
-        int score = Scoring.RunningTotal();
+        Status scoreStatus = Scoring.runningTotal();
 
-        if (score == -1)
-            VALID_DICE = false;
-        else {
-            VALID_DICE = true;
-            ROLLTOTAL = score;
-            lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
-        }
+        VALID_DICE = scoreStatus.diceValid;
+        ROLLTOTAL = scoreStatus.score;
+        lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
 
     }
 
