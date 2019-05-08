@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class FarkleGUI extends JFrame {
     private JPanel mainPanel;
@@ -13,9 +15,9 @@ public class FarkleGUI extends JFrame {
     private JLabel lblPlayerTwo;
     private JLabel lblPlayerOneScore;
     private JLabel lblPlayerTwoScore;
+    protected JLabel dice1;
     protected JLabel dice2;
     protected JLabel dice3;
-    protected JLabel dice1;
     protected JLabel dice4;
     protected JLabel dice5;
     protected JLabel dice6;
@@ -29,8 +31,22 @@ public class FarkleGUI extends JFrame {
     private JLabel lblRunningTotal;
     private JButton btnBankPoints;
 
-    public static HashMap<Integer, ImageIcon> images = new HashMap<>();
-    public static HashMap<JCheckBox, JLabel> checkBoxes = new HashMap<>();
+    // NEW!!!
+    private Dice[] dice = new Dice[6];
+
+    private JLabel[] labels = {dice1, dice2, dice3, dice4, dice5, dice6};
+    private JCheckBox[] checkBoxes = {chkBoxDiceOne, chkBoxDiceTwo, chkBoxDiceThree, chkBoxDiceFour,
+            chkBoxDiceFive, chkBoxDiceSix};
+    private ImageIcon[] images = new ImageIcon[7];
+
+    private boolean first_roll_of_turn = true;
+
+    private Random random = new Random();
+
+
+    ////////////////
+    //public static HashMap<Integer, ImageIcon> images = new HashMap<>();
+    //public static HashMap<JCheckBox, JLabel> checkBoxes = new HashMap<>();
     private int turn = 1;
     private int TOTAL = 0;
     private int ROLLTOTAL = 0;
@@ -61,19 +77,10 @@ public class FarkleGUI extends JFrame {
         btnRollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (VALID_DICE) {
-                    int count = 6;
-                    KeepDice();
-                    for (JCheckBox box : checkBoxes.keySet()) {
-                        if (box.isSelected())
-                            count--;
-                    }
-                    SetDice(Roll.RollDice(count));
-                }
-                else {
-                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
-                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
-                }
+
+                if (first_roll_of_turn)
+                    ResetDice();
+                    RollDice();
             }
         });
 
@@ -81,31 +88,29 @@ public class FarkleGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (VALID_DICE){
-
-                    ResetDice();
-                    if (turn == 1)
-                        turn = 2;
-                    else
-                        turn = 1;
-                    for (JCheckBox box : checkBoxes.keySet()){  // Disable checkboxes because dice have not been rolled yet
-                        box.setEnabled(false);
-                    }
-                    for (JLabel dice : checkBoxes.values()) {
-                        dice.setIcon(images.get(0));
-                    }
-                }
-                else {
-                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
-                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
-                }
-
-
+//                if (VALID_DICE){
+//
+//                    ResetDice();
+//                    if (turn == 1)
+//                        turn = 2;
+//                    else
+//                        turn = 1;
+//                    for (JCheckBox box : checkBoxes.keySet()){  // Disable checkboxes because dice have not been rolled yet
+//                        box.setEnabled(false);
+//                    }
+//                    for (JLabel dice : checkBoxes.values()) {
+//                        dice.setIcon(images.get(0));
+//                    }
+//                }
+//                else {
+//                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
+//                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
+//                }
             }
         });
 
-        for (JCheckBox box : checkBoxes.keySet()){
-
+        // Generate ActionListeners for all checkboxes
+        for (JCheckBox box : checkBoxes){
             box.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) { SetRunningTotal(); }
@@ -113,15 +118,38 @@ public class FarkleGUI extends JFrame {
         }
     }
 
+    private void RollDice() {
+
+        for (Dice die : dice)
+        {
+            if (die.isIs_in_play())
+            {
+                int roll = random.nextInt(6) + 1;
+
+                JLabel die_label = die.getLabel();
+                ImageIcon image = images[roll];
+                die_label.setIcon(image);
+
+                die.setDice_value(roll);
+            }
+        }
+    }
+
     private void ResetDice() {
-        for (JCheckBox box : checkBoxes.keySet()){
+        for (JCheckBox box : checkBoxes){
             box.setEnabled(true);
             box.setSelected(false);
+        }
+        for (Dice die : dice){
+            die.getLabel().setIcon(images[0]);
+            die.setDice_value(0);
+            die.setIs_in_play(true);
+            die.setIs_selected(false);
         }
     }
 
     private void KeepDice() {
-        for (JCheckBox box : checkBoxes.keySet()){
+        for (JCheckBox box : checkBoxes){
             if (box.isSelected())
                 box.setEnabled(false);
             else
@@ -130,41 +158,27 @@ public class FarkleGUI extends JFrame {
     }
 
     private void Setup() {
-        // Get all images, set images HashMap and set icons
-
+        // Get all images and add them to the images Array
         try {
-            ImageIcon one = new ImageIcon(new ImageIcon("faceOne.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon two = new ImageIcon(new ImageIcon("faceTwo.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon three = new ImageIcon(new ImageIcon("faceThree.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon four = new ImageIcon(new ImageIcon("faceFour.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon five= new ImageIcon(new ImageIcon("faceFive.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon six = new ImageIcon(new ImageIcon("faceSix.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon roll = new ImageIcon(new ImageIcon("rollDice.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[0] = new ImageIcon(new ImageIcon("rollDice.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[1] = new ImageIcon(new ImageIcon("faceOne.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[2] = new ImageIcon(new ImageIcon("faceTwo.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[3] = new ImageIcon(new ImageIcon("faceThree.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[4] = new ImageIcon(new ImageIcon("faceFour.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[5] = new ImageIcon(new ImageIcon("faceFive.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            images[6] = new ImageIcon(new ImageIcon("faceSix.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
 
-            images.put(0, roll);
-            images.put(1, one);
-            images.put(2, two);
-            images.put(3, three);
-            images.put(4, four);
-            images.put(5, five);
-            images.put(6, six);
+            for (JLabel label : labels)  // Set all dice icons to the 'roll' picture
+                label.setIcon(images[0]);
 
-            dice1.setIcon(roll);
-            dice2.setIcon(roll);
-            dice3.setIcon(roll);
-            dice4.setIcon(roll);
-            dice5.setIcon(roll);
-            dice6.setIcon(roll);
-
-        } catch (Exception ex) {
+            // Create 6 new Dice
+            for (int i = 0; i < 6; i++) {
+                Dice die = new Dice(labels[i], 0, false, false);
+                dice[i] = die;
+            }
+        } catch (Exception ex) {  // Catch if the images fail
             System.out.println(ex.toString());
         }
-        checkBoxes.put(chkBoxDiceOne, dice1);
-        checkBoxes.put(chkBoxDiceTwo, dice2);
-        checkBoxes.put(chkBoxDiceThree, dice3);
-        checkBoxes.put(chkBoxDiceFour, dice4);
-        checkBoxes.put(chkBoxDiceFive, dice5);
-        checkBoxes.put(chkBoxDiceSix, dice6);
     }
 
 
@@ -178,30 +192,12 @@ public class FarkleGUI extends JFrame {
         lblPlayerTwo.setText(playerTwo);
     }
 
-
-    private void SetDice(ArrayList<Integer> rolls) {
-
-        int roll = 0;
-
-        for (JCheckBox dice : checkBoxes.keySet()){
-            if (!dice.isSelected()){
-                checkBoxes.get(dice).setIcon(images.get(rolls.get(roll)));
-                roll++;
-            }
-        }
-    }
-
     private void SetRunningTotal(){
 
-        int score = Scoring.RunningTotal();
-
-        if (score == -1)
-            VALID_DICE = false;
-        else {
-            VALID_DICE = true;
-            ROLLTOTAL = score;
-            lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
-        }
+//        int score = Scoring.RunningTotal();
+//
+//        ROLLTOTAL = score;
+//        lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
 
     }
 

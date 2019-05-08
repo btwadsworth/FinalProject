@@ -3,23 +3,19 @@ package Farkle;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Scoring extends FarkleGUI {
 
-    private static HashMap<Integer, ImageIcon> images = FarkleGUI.images;
-    private static HashMap<JCheckBox, JLabel> checkBoxes = FarkleGUI.checkBoxes;
-
-    private static ArrayList<Integer> straight = new ArrayList<>() {
-        {
-            add(1);
-            add(2);
-            add(3);
-            add(4);
-            add(5);
-            add(6);
-        }
-    };
+//    private static ArrayList<Integer> straight = new ArrayList<>() {
+//        {
+//            add(1);
+//            add(2);
+//            add(3);
+//            add(4);
+//            add(5);
+//            add(6);
+//        }
+//    };
 
     public static int RunningTotal(){
 
