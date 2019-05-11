@@ -34,10 +34,13 @@ public class FarkleGUI extends JFrame {
     private ImageIcon[] images = new ImageIcon[7];
 
     private boolean first_roll_of_turn = true;
-    private boolean keep_at_least_one_dice;
+    private Status status = new Status(true, 0);
+    private int roll_total;
 
-    private Status status = new Status(false, 0);
+    private Validation validation = new Validation();
+    private Turn turn = new Turn();
 
+    private Player[] players = new Player[2];
 
     public FarkleGUI() {
 
@@ -65,35 +68,68 @@ public class FarkleGUI extends JFrame {
         btnRollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (first_roll_of_turn) {
-                    resetDice();
+
+                if (first_roll_of_turn)
+                {
+                    turn.startOfTurn(dice);
                     first_roll_of_turn = false;
                     Roll.rollDice(dice, images);
-
-                    if (Scoring.checkForFarkle(dice)){
-                        showMessage("FARKLE! End of turn");
-                        nextTurn();
-                    }
-                    else
-                        btnRollDice.setText("Roll Again");
                 }
-                else {
-                    if (status.isValid_dice()){
-                        keepDice();
-                        Roll.rollDice(dice, images);
-                    }
-                    else
-                        showMessage("One or more of the selected dice can't be kept.");
+                else
+                {
+                    if (validation.checkNoneSelected(dice))
+                        showMessage("You must keep at least one dice to roll again.");
+                    else {
+                        if (status.isValid_dice())
+                        {
+                            roll_total += status.getRoll_total();
 
+                            if (validation.checkAllSelected(dice)){
+                                turn.keepRolling(dice);
+                                Roll.rollDice(dice, images);
+                            }
+                            else{
+                                turn.keepDice(dice);
+                                Roll.rollDice(dice, images);
+                            }
+
+                        }
+                        else
+                            showMessage("One or more of the selected dice can't be kept.");
+                    }
 
                 }
+
+                if (Scoring.checkForFarkle(dice))
+                {
+                    showMessage("FARKLE! End of turn");
+                    nextTurn();
+                }
+                else
+                    btnRollDice.setText("Roll Again");
             }
         });
 
         btnBankPoints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                resetDice();
+                if (validation.checkNoneSelected(dice))
+                    showMessage("You must select a dice in order to bank your points.");
+                else{
+                    for (Player player : players){
+                        if (player.isTurn()){
+                            int total = roll_total + status.getRoll_total();
+                            player.addToScore(total);
+                            player.changeScoreLabel();
+//                            player.setTurn(false);
+                        }
+//                        else
+//                            player.setTurn(true);
+                    }
+                    turn.endTurn(dice, images);
+                    nextTurn();
+                }
+
             }
         });
 
@@ -103,37 +139,53 @@ public class FarkleGUI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     status = Scoring.RunningTotal(dice);
-                    String total = Integer.toString(status.getRoll_total());
+                    int currentTotal = status.getRoll_total();
+                    int visibleTotal = currentTotal + roll_total;
+                    String total = Integer.toString(visibleTotal);
                     lblRunningTotal.setText(total);
                 }
             });
         }
     }
 
-    private void resetDice() {
-        for (Dice die : dice){
-            die.getLabel().setIcon(images[0]);
-            die.getCheckbox().setSelected(false);
-            die.getCheckbox().setEnabled(true);
-            die.setValue(0);
-            die.setInPlay(true);
-            die.setSelected(false);
-        }
-    }
+//    private void startOfTurn() {
+//
+//        for (Dice die : dice){
+//            die.getLabel().setIcon(images[0]);
+//            die.getCheckbox().setSelected(false);
+//            die.getCheckbox().setEnabled(true);
+//            die.setValue(0);
+//            die.setInPlay(true);
+//            die.setSelected(false);
+//        }
+//    }
 
-    private void keepDice() {
-        for (Dice die : dice){
-            if (die.isSelected()){
-                die.setInPlay(false);
-                die.getCheckbox().setEnabled(false);
-            }
+//    private void keepDice() {
+//        for (Dice die : dice){
+//            if (die.isSelected()){
+//                die.setInPlay(false);
+//                die.getCheckbox().setEnabled(false);
+//            }
+//        }
+//    }
+
+    private void changeTurn(){
+        for (Player player : players){
+            if (player.isTurn())
+                player.setTurn(false);
+            else
+                player.setTurn(true);
         }
     }
 
     private void nextTurn(){
-        resetDice();
+        changeTurn();
+        turn.endTurn(dice, images);
         first_roll_of_turn = true;
         btnRollDice.setText("Roll Dice");
+        status.setRoll_total(0);
+        roll_total = 0;
+        lblRunningTotal.setText("0");
     }
 
     private void setup() {
@@ -153,7 +205,7 @@ public class FarkleGUI extends JFrame {
 
             // Create 6 new Dice
             for (int i = 0; i < 6; i++) {
-                Dice die = new Dice(labels[i], checkBoxes[i], 0, false, false);
+                Dice die = new Dice(labels[i], checkBoxes[i], 0, true, false);
                 dice[i] = die;
             }
         } catch (Exception ex) {  // Catch if the images fail
@@ -163,18 +215,16 @@ public class FarkleGUI extends JFrame {
 
     // Call Player to get players names and create new Player Objects
     private void setupPlayers() {
-        Player playerOne = Player.addPlayer("Enter name for Player 1:", true);
-        Player playerTwo = Player.addPlayer("Enter name for Player 2:", false);
+        players[0] = Player.addPlayer("Enter name for Player 1:", true, lblPlayerOneScore);
+        players[1] = Player.addPlayer("Enter name for Player 2:", false, lblPlayerTwoScore);
 
-        lblPlayerOne.setText(playerOne.getName());
-        lblPlayerTwo.setText(playerTwo.getName());
+        lblPlayerOne.setText(players[0].getName());
+        lblPlayerTwo.setText(players[1].getName());
     }
 
     private void showMessage(String message){
         JOptionPane.showMessageDialog(this, message);
     }
-
-
 
 }
 
