@@ -39,5 +39,4 @@ public class Dice {
 
     public void setSelected(boolean selected) { this.selected = selected; }
 
-
 }

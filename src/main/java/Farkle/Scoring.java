@@ -79,26 +79,6 @@ public class Scoring {
             if (die.isInPlay() && die.isSelected())
             {
                 int value = die.getValue();
-//                switch (value) {
-//                    case 1:
-//                        values[0] += 1;
-//                        break;
-//                    case 2:
-//                        values[1] += 1;
-//                        break;
-//                    case 3:
-//                        values[2] += 1;
-//                        break;
-//                    case 4:
-//                        values[3] += 1;
-//                        break;
-//                    case 5:
-//                        values[4] += 1;
-//                        break;
-//                    case 6:
-//                        values[5] += 1;
-//                        break;
-//                }
                 values[value-1]++;
             }
         }

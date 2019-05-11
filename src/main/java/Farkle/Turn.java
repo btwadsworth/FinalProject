@@ -38,5 +38,4 @@ public class Turn {
             die.getCheckbox().setEnabled(false);
         }
     }
-
 }

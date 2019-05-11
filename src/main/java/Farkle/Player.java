@@ -9,7 +9,7 @@ public class Player {
     private boolean turn;
     private JLabel score_label;
 
-    // Constructor
+    // Constructors
     public Player(String name, int score, boolean turn, JLabel label){
         this.name = name;
         this.score = score;
@@ -43,13 +43,15 @@ public class Player {
         this.score_label.setText(Integer.toString(this.score));
     }
 
-    // Change players turns
-    public static void changeTurns(Player[] players){
+    // Change players turns and set the player rolling label
+    public static void changeTurns(Player[] players, JLabel label){
         for (Player player : players){
             if (player.isTurn())
                 player.setTurn(false);
-            else
+            else {
                 player.setTurn(true);
+                label.setText(player.name);
+            }
         }
     }
 
@@ -64,6 +66,4 @@ public class Player {
                 return new Player(name, 0, turn, label);
         }
     }
-
-
 }
