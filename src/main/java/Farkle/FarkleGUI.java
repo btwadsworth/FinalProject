@@ -121,10 +121,7 @@ public class FarkleGUI extends JFrame {
                             int total = roll_total + status.getRoll_total();
                             player.addToScore(total);
                             player.changeScoreLabel();
-//                            player.setTurn(false);
                         }
-//                        else
-//                            player.setTurn(true);
                     }
                     turn.endTurn(dice, images);
                     nextTurn();
@@ -148,38 +145,8 @@ public class FarkleGUI extends JFrame {
         }
     }
 
-//    private void startOfTurn() {
-//
-//        for (Dice die : dice){
-//            die.getLabel().setIcon(images[0]);
-//            die.getCheckbox().setSelected(false);
-//            die.getCheckbox().setEnabled(true);
-//            die.setValue(0);
-//            die.setInPlay(true);
-//            die.setSelected(false);
-//        }
-//    }
-
-//    private void keepDice() {
-//        for (Dice die : dice){
-//            if (die.isSelected()){
-//                die.setInPlay(false);
-//                die.getCheckbox().setEnabled(false);
-//            }
-//        }
-//    }
-
-    private void changeTurn(){
-        for (Player player : players){
-            if (player.isTurn())
-                player.setTurn(false);
-            else
-                player.setTurn(true);
-        }
-    }
-
     private void nextTurn(){
-        changeTurn();
+        Player.changeTurns(players);
         turn.endTurn(dice, images);
         first_roll_of_turn = true;
         btnRollDice.setText("Roll Dice");

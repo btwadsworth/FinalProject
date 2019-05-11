@@ -43,6 +43,16 @@ public class Player {
         this.score_label.setText(Integer.toString(this.score));
     }
 
+    // Change players turns
+    public static void changeTurns(Player[] players){
+        for (Player player : players){
+            if (player.isTurn())
+                player.setTurn(false);
+            else
+                player.setTurn(true);
+        }
+    }
+
 
     // This is used for adding players at the beginning of the game
     // The user enters the name and only creates/returns a new player if they enter some text
