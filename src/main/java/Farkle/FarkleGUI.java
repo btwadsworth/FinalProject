@@ -4,10 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
 public class FarkleGUI extends JFrame {
     private JPanel mainPanel;
@@ -31,81 +27,73 @@ public class FarkleGUI extends JFrame {
     private JLabel lblRunningTotal;
     private JButton btnBankPoints;
 
-    // NEW!!!
     private Dice[] dice = new Dice[6];
-
     private JLabel[] labels = {dice1, dice2, dice3, dice4, dice5, dice6};
     private JCheckBox[] checkBoxes = {chkBoxDiceOne, chkBoxDiceTwo, chkBoxDiceThree, chkBoxDiceFour,
-            chkBoxDiceFive, chkBoxDiceSix};
+                                      chkBoxDiceFive, chkBoxDiceSix};
     private ImageIcon[] images = new ImageIcon[7];
 
     private boolean first_roll_of_turn = true;
+    private boolean keep_at_least_one_dice;
 
-    private Random random = new Random();
-
-
-    ////////////////
-    //public static HashMap<Integer, ImageIcon> images = new HashMap<>();
-    //public static HashMap<JCheckBox, JLabel> checkBoxes = new HashMap<>();
-    private int turn = 1;
-    private int TOTAL = 0;
-    private int ROLLTOTAL = 0;
-    private int PLAYERONESCORE = 0;
-    private int PLAYERTWOSCORE = 0;
-
-    protected static boolean VALID_DICE = true;
+    private Status status = new Status(false, 0);
 
 
     public FarkleGUI() {
 
         setContentPane(mainPanel);
 
-        Setup();
+        setup(); // setup the images and Arrays for the game
 
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        AddPlayers();
+        // Get names for both players and create new Player Objects for them
+        setupPlayers();
 
-        AddListeners();
+        // Add listeners for GUI form
+        addListeners();
         
     }
 
-    private void AddListeners() { // Add listeners to the form
+    private void addListeners() { // Add listeners to the form
 
+         // The listener for when the "Roll Dice" button is clicked
+         // Check if it is the first roll of the turn or not to reset the dice or keep selected dice
+         // Then call Roll.rollDice to roll the dice
         btnRollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (first_roll_of_turn) {
+                    resetDice();
+                    first_roll_of_turn = false;
+                    Roll.rollDice(dice, images);
 
-                if (first_roll_of_turn)
-                    ResetDice();
-                    RollDice();
+                    if (Scoring.checkForFarkle(dice)){
+                        showMessage("FARKLE! End of turn");
+                        nextTurn();
+                    }
+                    else
+                        btnRollDice.setText("Roll Again");
+                }
+                else {
+                    if (status.isValid_dice()){
+                        keepDice();
+                        Roll.rollDice(dice, images);
+                    }
+                    else
+                        showMessage("One or more of the selected dice can't be kept.");
+
+
+                }
             }
         });
 
         btnBankPoints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-//                if (VALID_DICE){
-//
-//                    ResetDice();
-//                    if (turn == 1)
-//                        turn = 2;
-//                    else
-//                        turn = 1;
-//                    for (JCheckBox box : checkBoxes.keySet()){  // Disable checkboxes because dice have not been rolled yet
-//                        box.setEnabled(false);
-//                    }
-//                    for (JLabel dice : checkBoxes.values()) {
-//                        dice.setIcon(images.get(0));
-//                    }
-//                }
-//                else {
-//                    JOptionPane.showMessageDialog(null, "One or more of the selected dice can't be kept.",
-//                            "Invalid Move",JOptionPane.WARNING_MESSAGE );
-//                }
+                resetDice();
             }
         });
 
@@ -113,51 +101,42 @@ public class FarkleGUI extends JFrame {
         for (JCheckBox box : checkBoxes){
             box.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) { SetRunningTotal(); }
+                public void actionPerformed(ActionEvent e) {
+                    status = Scoring.RunningTotal(dice);
+                    String total = Integer.toString(status.getRoll_total());
+                    lblRunningTotal.setText(total);
+                }
             });
         }
     }
 
-    private void RollDice() {
+    private void resetDice() {
+        for (Dice die : dice){
+            die.getLabel().setIcon(images[0]);
+            die.getCheckbox().setSelected(false);
+            die.getCheckbox().setEnabled(true);
+            die.setValue(0);
+            die.setInPlay(true);
+            die.setSelected(false);
+        }
+    }
 
-        for (Dice die : dice)
-        {
-            if (die.isIs_in_play())
-            {
-                int roll = random.nextInt(6) + 1;
-
-                JLabel die_label = die.getLabel();
-                ImageIcon image = images[roll];
-                die_label.setIcon(image);
-
-                die.setDice_value(roll);
+    private void keepDice() {
+        for (Dice die : dice){
+            if (die.isSelected()){
+                die.setInPlay(false);
+                die.getCheckbox().setEnabled(false);
             }
         }
     }
 
-    private void ResetDice() {
-        for (JCheckBox box : checkBoxes){
-            box.setEnabled(true);
-            box.setSelected(false);
-        }
-        for (Dice die : dice){
-            die.getLabel().setIcon(images[0]);
-            die.setDice_value(0);
-            die.setIs_in_play(true);
-            die.setIs_selected(false);
-        }
+    private void nextTurn(){
+        resetDice();
+        first_roll_of_turn = true;
+        btnRollDice.setText("Roll Dice");
     }
 
-    private void KeepDice() {
-        for (JCheckBox box : checkBoxes){
-            if (box.isSelected())
-                box.setEnabled(false);
-            else
-                box.setEnabled(true);
-        }
-    }
-
-    private void Setup() {
+    private void setup() {
         // Get all images and add them to the images Array
         try {
             images[0] = new ImageIcon(new ImageIcon("rollDice.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
@@ -168,12 +147,13 @@ public class FarkleGUI extends JFrame {
             images[5] = new ImageIcon(new ImageIcon("faceFive.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             images[6] = new ImageIcon(new ImageIcon("faceSix.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
 
-            for (JLabel label : labels)  // Set all dice icons to the 'roll' picture
+            // Set all dice icons to the 'roll' picture
+            for (JLabel label : labels)
                 label.setIcon(images[0]);
 
             // Create 6 new Dice
             for (int i = 0; i < 6; i++) {
-                Dice die = new Dice(labels[i], 0, false, false);
+                Dice die = new Dice(labels[i], checkBoxes[i], 0, false, false);
                 dice[i] = die;
             }
         } catch (Exception ex) {  // Catch if the images fail
@@ -181,25 +161,20 @@ public class FarkleGUI extends JFrame {
         }
     }
 
+    // Call Player to get players names and create new Player Objects
+    private void setupPlayers() {
+        Player playerOne = Player.addPlayer("Enter name for Player 1:", true);
+        Player playerTwo = Player.addPlayer("Enter name for Player 2:", false);
 
-    private void AddPlayers() {
-        // Get player names using JOptionPane.showInputDialog
-        // Set player name labels using input
-
-        String playerOne = JOptionPane.showInputDialog("Player One:");
-        lblPlayerOne.setText(playerOne);
-        String playerTwo = JOptionPane.showInputDialog("Player Two:");
-        lblPlayerTwo.setText(playerTwo);
+        lblPlayerOne.setText(playerOne.getName());
+        lblPlayerTwo.setText(playerTwo.getName());
     }
 
-    private void SetRunningTotal(){
-
-//        int score = Scoring.RunningTotal();
-//
-//        ROLLTOTAL = score;
-//        lblRunningTotal.setText(Integer.toString(TOTAL + ROLLTOTAL));
-
+    private void showMessage(String message){
+        JOptionPane.showMessageDialog(this, message);
     }
+
+
 
 }
 

@@ -1,114 +1,120 @@
 package Farkle;
 
-
 import javax.swing.*;
-import java.util.ArrayList;
 
-public class Scoring extends FarkleGUI {
+public class Scoring {
 
-//    private static ArrayList<Integer> straight = new ArrayList<>() {
-//        {
-//            add(1);
-//            add(2);
-//            add(3);
-//            add(4);
-//            add(5);
-//            add(6);
-//        }
-//    };
+    public static Status RunningTotal(Dice[] dice){
 
-    public static int RunningTotal(){
-
-        int total = 0;
-
-        ArrayList<Integer> diceValues = new ArrayList<>();
-
-        for (JCheckBox box : checkBoxes.keySet()){
-            if (box.isEnabled() && box.isSelected()){
-                ImageIcon temp = (ImageIcon) checkBoxes.get(box).getIcon();
-
-                if (temp == images.get(1))
-                    diceValues.add(1);
-                else if (temp == images.get(2))
-                    diceValues.add(2);
-                else if (temp == images.get(3))
-                    diceValues.add(3);
-                else if (temp == images.get(4))
-                    diceValues.add(4);
-                else if (temp == images.get(5))
-                    diceValues.add(5);
-                else if (temp == images.get(6))
-                    diceValues.add(6);
-            }
+        for (Dice die : dice){
+            JCheckBox box = die.getCheckbox();
+            if (box.isSelected())
+                die.setSelected(true);
+            else
+                die.setSelected(false);
         }
 
-        if (diceValues.containsAll(straight))
-            return 1500;
-        else {
-            int one = 0;
-            int two = 0;
-            int three = 0;
-            int four = 0;
-            int five = 0;
-            int six = 0;
+        int[] values = getDiceValues(dice);
 
-            for (Integer num : diceValues){
+        if (straight(values))
+            return new Status(true, 1500);
 
-                switch (num){
-                    case 1:
-                        one++;
-                        break;
-                    case 2:
-                        two++;
-                        break;
-                    case 3:
-                        three++;
-                        break;
-                    case 4:
-                        four++;
-                        break;
-                    case 5:
-                        five++;
-                        break;
-                    case 6:
-                        six++;
-                        break;
-                }
-            }
+        int total = countTotal(values);
 
-            if ((0 < two && two < 3) || (0 < three && three < 3) || (0 < four && four < 3) || (0 < six && six < 3)){
-                FarkleGUI.VALID_DICE = false;
-                System.out.println("Here");
-            } else {
-                FarkleGUI.VALID_DICE = true;
-                System.out.println("There");
-            }
-
-
-            if (two >= 3)
-                total += 200 * (two - 2);
-            if (three >= 3)
-                total += 300 * (three - 2);
-            if (four >= 3)
-                total += 400 * (four - 2);
-            if (six >= 3)
-                total += 600 * (six - 2);
-
-            if (one < 3)
-                total += 100 * one;
-            else
-                total += 1000 * (one - 2);
-
-            if (five < 3)
-                total += 50 * five;
-            else
-                total += 500 * (five - 2);
-
-            return total;
-
-        }
+        if (checkForInvalidSelection(values))
+            return new Status(false, total);
+        else
+            return new Status(true, total);
     }
 
 
+    private static int countTotal(int[] values) {
+        int total = 0;
 
+        if (values[1] >= 3)
+            total += 200 * (values[1] - 2);
+        if (values[2] >= 3)
+            total += 300 * (values[2] - 2);
+        if (values[3] >= 3)
+            total += 400 * (values[3] - 2);
+        if (values[5] >= 3)
+            total += 600 * (values[5] - 2);
+
+        if (values[0] < 3)
+            total += 100 * values[0];
+        else
+            total += 1000 * (values[0] - 2);
+
+        if (values[4] < 3)
+            total += 50 * values[4];
+        else
+            total += 500 * (values[4] - 2);
+
+        return total;
+    }
+
+    private static boolean checkForInvalidSelection(int[] values) {
+
+        return (0 < values[1] && values[1] < 3 ||
+                0 < values[2] && values[2] < 3 ||
+                0 < values[3] && values[3] < 3 ||
+                0 < values[5] && values[5] < 3 );
+    }
+
+
+    private static boolean straight(int[] values) {
+        for (int val : values) {
+            if (val != 1)
+                return false;
+        }
+        return true;
+    }
+
+    // Count the values of
+    private static int[] getDiceValues(Dice[] dice){
+        int[] values = {0,0,0,0,0,0};
+
+        for (Dice die : dice)
+        {
+            if (die.isInPlay() && die.isSelected())
+            {
+                int value = die.getValue();
+//                switch (value) {
+//                    case 1:
+//                        values[0] += 1;
+//                        break;
+//                    case 2:
+//                        values[1] += 1;
+//                        break;
+//                    case 3:
+//                        values[2] += 1;
+//                        break;
+//                    case 4:
+//                        values[3] += 1;
+//                        break;
+//                    case 5:
+//                        values[4] += 1;
+//                        break;
+//                    case 6:
+//                        values[5] += 1;
+//                        break;
+//                }
+                values[value-1]++;
+            }
+        }
+        return values;
+    }
+
+    public static boolean checkForFarkle(Dice[] dice){
+
+        int[] values = {0,0,0,0,0,0};
+
+        for (Dice die : dice){
+            if (die.getCheckbox().isEnabled()){
+                int value = die.getValue();
+                values[value-1]++;
+            }
+        }
+        return (values[0] == 0 && values[1] < 3 && values[2] < 3 && values[3] < 3 && values[4] == 0 && values[5] < 3);
+    }
 }

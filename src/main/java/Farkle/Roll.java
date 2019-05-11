@@ -1,21 +1,31 @@
 package Farkle;
 
-import java.util.ArrayList;
+import javax.swing.*;
 import java.util.Random;
 
 public class Roll {
 
-    public static ArrayList<Integer> RollDice(Integer dice){
+    /**
+     * Roll the dice using a random number generator
+     * Check if the dice is in play and roll if it is
+     * Then set the label as the correct image
+     * and set the new Dice value
+    **/
+    public static void rollDice(Dice[] dice, ImageIcon[] images){
 
-        Random rnd = new Random();
-        ArrayList<Integer> rolls = new ArrayList<>();
+        Random random = new Random();
 
-        for (int i = 0; i < dice; i++) {
-            Integer num = rnd.nextInt(6)+1;
-            rolls.add(num);
+        for (Dice die : dice) {
+            if (die.isInPlay()) {
+                int roll = random.nextInt(6) + 1;
+
+                JLabel die_label = die.getLabel();
+                ImageIcon image = images[roll];
+                die_label.setIcon(image);
+
+                die.setValue(roll);
+            }
         }
-
-        return rolls;
     }
 
 }

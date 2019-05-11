@@ -4,28 +4,40 @@ import javax.swing.*;
 
 public class Dice {
     private JLabel label;
-    private int dice_value;
-    private boolean is_in_play;
-    private boolean is_selected;
+    private JCheckBox checkbox;
+    private int value;
+    private boolean inPlay;
+    private boolean selected;
 
-    Dice(JLabel label, Integer value, Boolean in_play, Boolean selected){
+    // Constructor
+    Dice(JLabel label, JCheckBox box, Integer value, Boolean in_play, Boolean selected){
         this.label = label;
-        this.dice_value = value;
-        this.is_in_play = in_play;
-        this.is_selected = selected;
+        this.checkbox = box;
+        this.value = value;
+        this.inPlay = in_play;
+        this.selected = selected;
     }
 
+    // Getters and Setters
     public JLabel getLabel() { return label; }
+
     public void setLabel(JLabel label) { this.label = label; }
 
-    public int getDice_value() { return dice_value; }
-    public void setDice_value(int dice_value) { this.dice_value = dice_value; }
+    public JCheckBox getCheckbox() { return checkbox; }
 
-    public boolean isIs_in_play() { return is_in_play; }
-    public void setIs_in_play(boolean is_in_play) { this.is_in_play = is_in_play; }
+    public void setCheckbox(JCheckBox checkbox) { this.checkbox = checkbox; }
 
-    public boolean isIs_selected() { return is_selected; }
-    public void setIs_selected(boolean is_selected) { this.is_selected = is_selected; }
+    public int getValue() { return value; }
+
+    public void setValue(int value) { this.value = value; }
+
+    public boolean isInPlay() { return inPlay; }
+
+    public void setInPlay(boolean inPlay) { this.inPlay = inPlay; }
+
+    public boolean isSelected() { return selected; }
+
+    public void setSelected(boolean selected) { this.selected = selected; }
 
 
 }
