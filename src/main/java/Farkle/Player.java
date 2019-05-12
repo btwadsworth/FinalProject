@@ -62,6 +62,8 @@ public class Player {
         while (true) {
             String name = JOptionPane.showInputDialog(message);
 
+            // TODO make it so that the user can't continue until entering player names
+
             if (!name.equals(""))
                 return new Player(name, 0, turn, label);
         }

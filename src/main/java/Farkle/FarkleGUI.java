@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class FarkleGUI extends JFrame {
     private JPanel mainPanel;
@@ -178,6 +180,14 @@ public class FarkleGUI extends JFrame {
                 for (JCheckBox box : checkBoxes){
                     box.doClick();
                 }
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                // TODO Add check for if the user wants to save game before closing
             }
         });
     }
