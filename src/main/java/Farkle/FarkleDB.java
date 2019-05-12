@@ -82,6 +82,10 @@ public class FarkleDB {
             ResultSet resultSet = loadStatement.executeQuery();
 
             if (!resultSet.isBeforeFirst()) {
+
+                if (load)
+                    JOptionPane.showMessageDialog(null, "There was no saved game.");
+
                 players[0] = Player.addPlayer("Enter name for Player 1:", true, labels[0]);
                 players[1] = Player.addPlayer("Enter name for Player 2:", false, labels[1]);
                 return players;
@@ -103,7 +107,7 @@ public class FarkleDB {
         }
     }
 
-    private void dropTable() {
+    public void dropTable() {
 
         final String dropTable = "DROP TABLE IF EXISTS %s";
 

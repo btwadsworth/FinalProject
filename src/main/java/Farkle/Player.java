@@ -59,13 +59,18 @@ public class Player {
     // This is used for adding players at the beginning of the game
     // The user enters the name and only creates/returns a new player if they enter some text
     public static Player addPlayer(String message, boolean turn, JLabel label){
-        while (true) {
-            String name = JOptionPane.showInputDialog(message);
+        String name = "";
+        while (name.equals("")) {
 
-            // TODO make it so that the user can't continue until entering player names
-
-            if (!name.equals(""))
-                return new Player(name, 0, turn, label);
+            JOptionPane pane = new JOptionPane(null);
+            pane.setWantsInput(true);
+            JDialog dialog = pane.createDialog(null, message);
+            dialog.setContentPane(pane);
+            dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            dialog.setVisible(true);
+            if (!pane.getInputValue().equals("uninitializedValue"))
+                name = (String) pane.getInputValue();
         }
+        return new Player(name, 0, turn, label);
     }
 }

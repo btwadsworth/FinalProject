@@ -129,6 +129,8 @@ public class FarkleGUI extends JFrame {
                             player.changeScoreLabel();
                             if (player.getScore() >= 10000){
                                 showMessage(player.getName() + " is the Winner!");
+                                farkleDB.dropTable();
+                                System.exit(0);
                             }
                         }
                     }
@@ -187,7 +189,22 @@ public class FarkleGUI extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                // TODO Add check for if the user wants to save game before closing
+                Object[] options = { "Yes", "No" };
+                JOptionPane pane = new JOptionPane(null);
+                pane.setMessageType(JOptionPane.WARNING_MESSAGE);
+                pane.setMessage("Do you want to save the game before closing?");
+                pane.setOptions(options);
+                JDialog dialog = pane.createDialog(null, "Save Game?");
+                dialog.setContentPane(pane);
+                dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+                dialog.setVisible(true);
+                Object choice = pane.getValue();
+
+                if (choice.equals("Yes"))
+                    farkleDB.saveGame(players);
+
+                System.exit(0);
+
             }
         });
     }
