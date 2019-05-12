@@ -33,6 +33,9 @@ public class FarkleDB {
 
     public void saveGame(Player[] players){
 
+        dropTable();
+        createTable();
+
         final String savePlayerInfo = "INSERT INTO saved_game VALUES (?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL);
@@ -59,7 +62,12 @@ public class FarkleDB {
         }
     }
 
-    public Player[] loadGame(JLabel[] labels) {
+    public Player[] loadGame(JLabel[] labels, boolean load) {
+
+        if (!load){
+            dropTable();
+            createTable();
+        }
 
         final String loadPlayerInfo = "SELECT * FROM %s";
 
@@ -92,6 +100,22 @@ public class FarkleDB {
         } catch (SQLException ex) {
             System.out.println("An error occurred loading the saved game.");
             return players;
+        }
+    }
+
+    private void dropTable() {
+
+        final String dropTable = "DROP TABLE IF EXISTS %s";
+
+        String dropSQL = String.format(dropTable, SAVED_GAME);
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement dropStatement = conn.prepareStatement(dropSQL)) {
+
+            dropStatement.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }

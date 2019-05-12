@@ -17,6 +17,9 @@ public class Scoring {
         int[] values = getDiceValues(dice);
 
         if (straight(values))
+            return new Status(true, 1200);
+
+        if (threePairs(values))
             return new Status(true, 1500);
 
         int total = countTotal(values);
@@ -70,6 +73,15 @@ public class Scoring {
         return true;
     }
 
+    private static boolean threePairs(int[] values) {
+        int pairs = 0;
+        for (int val : values){
+            if (val == 2)
+                pairs++;
+        }
+        return (pairs == 3);
+    }
+
     // Count the values of
     private static int[] getDiceValues(Dice[] dice){
         int[] values = {0,0,0,0,0,0};
@@ -97,4 +109,13 @@ public class Scoring {
         }
         return (values[0] == 0 && values[1] < 3 && values[2] < 3 && values[3] < 3 && values[4] == 0 && values[5] < 3);
     }
+
+    public static boolean allSelected(Dice[] dice){
+        for (Dice die : dice){
+            if (!die.isSelected())
+                return false;
+        }
+        return true;
+    }
+
 }

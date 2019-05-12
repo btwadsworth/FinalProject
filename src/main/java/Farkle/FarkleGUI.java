@@ -57,8 +57,6 @@ public class FarkleGUI extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
-
         // Get names for both players and create new Player Objects for them
         setupPlayers();
 
@@ -147,6 +145,10 @@ public class FarkleGUI extends JFrame {
                     int visibleTotal = currentTotal + roll_total;
                     String total = Integer.toString(visibleTotal);
                     lblRunningTotal.setText(total);
+                    if (Scoring.allSelected(dice) && status.isValid_dice()){
+                        showMessage("The dice are hot! Keep 'em rolling!");
+                        btnRollDice.doClick();
+                    }
                 }
             });
         }
@@ -154,8 +156,10 @@ public class FarkleGUI extends JFrame {
         btnSaveGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (showConfirm("Are you sure you want to save and quit?", "SAVE & QUIT"))
+                if (showConfirm("Are you sure you want to save and quit?", "SAVE & QUIT")){
                     farkleDB.saveGame(players);
+                    System.exit(0);
+                }
             }
         });
     }
@@ -198,7 +202,9 @@ public class FarkleGUI extends JFrame {
     // Call Player to get players names and create new Player Objects
     private void setupPlayers() {
 
-        players = farkleDB.loadGame(playerScoreLabels);
+        boolean loadGame = loadGameConfirm();
+
+        players = farkleDB.loadGame(playerScoreLabels, loadGame);
 
         lblPlayerOne.setText(players[0].getName());
         lblPlayerTwo.setText(players[1].getName());
@@ -216,6 +222,21 @@ public class FarkleGUI extends JFrame {
     private boolean showConfirm(String message, String title) {
         return (JOptionPane.showConfirmDialog(this, message, title,
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
+    }
+
+    private boolean loadGameConfirm(){
+        Object[] options = { "Load Game", "Start New Game" };
+        int result = JOptionPane.showOptionDialog(
+                        mainPanel,
+                        "Would you like to load the saved game?",
+                        "Load Game or Start New",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        options,
+                        null);
+
+        return (result == 0);
     }
 
 }
