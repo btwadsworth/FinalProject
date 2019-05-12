@@ -28,6 +28,8 @@ public class FarkleGUI extends JFrame {
     private JButton btnBankPoints;
     private JLabel lblPlayerRolling;
     private JButton btnSaveGame;
+    private JButton btnRules;
+    private JButton btnSelectAll;
 
     private Dice[] dice = new Dice[6];
     private JLabel[] labels = {dice1, dice2, dice3, dice4, dice5, dice6};
@@ -159,6 +161,22 @@ public class FarkleGUI extends JFrame {
                 if (showConfirm("Are you sure you want to save and quit?", "SAVE & QUIT")){
                     farkleDB.saveGame(players);
                     System.exit(0);
+                }
+            }
+        });
+
+        btnRules.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMessage(Rules.rules);
+            }
+        });
+
+        btnSelectAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (JCheckBox box : checkBoxes){
+                    box.doClick();
                 }
             }
         });
