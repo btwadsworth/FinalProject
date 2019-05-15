@@ -1,3 +1,9 @@
+/**
+ * Ben Wadsworth
+ * 5/14/2019
+ * This is the main class for the program, handling all the gui components and their listeners
+ */
+
 package Farkle;
 
 import javax.swing.*;
@@ -33,22 +39,22 @@ public class FarkleGUI extends JFrame {
     private JButton btnRules;
     private JButton btnSelectAll;
 
+    // Declare variables
     private Dice[] dice = new Dice[6];
     private JLabel[] labels = {dice1, dice2, dice3, dice4, dice5, dice6};
     private JCheckBox[] checkBoxes = {chkBoxDiceOne, chkBoxDiceTwo, chkBoxDiceThree, chkBoxDiceFour,
                                       chkBoxDiceFive, chkBoxDiceSix};
     private ImageIcon[] images = new ImageIcon[7];
     private JLabel[] playerScoreLabels = {lblPlayerOneScore, lblPlayerTwoScore};
-
     private boolean first_roll_of_turn = true;
     private Status status = new Status(true, 0);
     private int roll_total;
+    private Player[] players = new Player[2];
+    private int WINNING_SCORE = 10000;
+
 
     private Validation validation = new Validation();
     private Turn turn = new Turn();
-
-    private Player[] players = new Player[2];
-
     private FarkleDB farkleDB = new FarkleDB();
 
     public FarkleGUI() {
@@ -80,24 +86,30 @@ public class FarkleGUI extends JFrame {
 
                 if (first_roll_of_turn)
                 {
-                    turn.startOfTurn(dice);
+                    turn.startOfTurn(dice);  // Sets the dice up for the roll
                     first_roll_of_turn = false;
                     Roll.rollDice(dice, images);
                 }
                 else
                 {
+                    // Can't roll again again without having at least one dice selected
                     if (validation.checkNoneSelected(dice))
                         showMessage("You must keep at least one dice to roll again.");
-                    else {
+
+                    else
+                    {
+                        // Checks the Status of the selected dice
                         if (status.isValid_dice())
                         {
                             roll_total += status.getRoll_total();
 
+                            // If all dice are selected and valid the program rolls the dice again for you
                             if (validation.checkAllSelected(dice)){
                                 turn.keepRolling(dice);
                                 Roll.rollDice(dice, images);
                             }
-                            else{
+                            else
+                            {
                                 turn.keepDice(dice);
                                 Roll.rollDice(dice, images);
                             }
@@ -106,6 +118,8 @@ public class FarkleGUI extends JFrame {
                             showMessage("One or more of the selected dice can't be kept.");
                     }
                 }
+
+                // Immediately Checks if none of the dice rolled can score AKA "FARKLE"
                 if (Scoring.checkForFarkle(dice))
                 {
                     showMessage("FARKLE! End of turn");
@@ -116,6 +130,8 @@ public class FarkleGUI extends JFrame {
             }
         });
 
+        // Bank points ends the rolling players turn, saves their score and changes the active rolling player
+        //   to the other player.  If the user has 10000,
         btnBankPoints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -127,7 +143,7 @@ public class FarkleGUI extends JFrame {
                             int total = roll_total + status.getRoll_total();
                             player.addToScore(total);
                             player.changeScoreLabel();
-                            if (player.getScore() >= 10000){
+                            if (player.getScore() >= WINNING_SCORE){
                                 showMessage(player.getName() + " is the Winner!");
                                 farkleDB.dropTable();
                                 System.exit(0);

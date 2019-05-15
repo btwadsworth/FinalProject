@@ -78,6 +78,8 @@ public class Scoring {
         for (int val : values){
             if (val == 2)
                 pairs++;
+            if (val == 4)  // Just added
+                pairs++;
         }
         return (pairs == 3);
     }
