@@ -3,6 +3,13 @@ package Farkle;
 import javax.swing.*;
 
 public class Dice {
+    /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class handles the Dice Objects for the application Dice(JLabel, JCheckbox, value, inPlay, selected0
+     */
+
+    // Declare variables
     private JLabel label;
     private JCheckBox checkbox;
     private int value;

@@ -4,8 +4,13 @@ import javax.swing.*;
 import java.util.Random;
 
 public class Roll {
-
     /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class handles rolling the dice
+     *
+     *
+     *
      * Roll the dice using a random number generator
      * Check if the dice is in play and roll if it is
      * Then set the label as the correct image

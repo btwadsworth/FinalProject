@@ -1,7 +1,13 @@
 package Farkle;
 
 public class Status {
+    /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class handles the Status Object for the program
+     */
 
+    // Declare variables
     private boolean valid_dice;
     private int roll_total;
 

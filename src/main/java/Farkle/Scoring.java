@@ -3,13 +3,22 @@ package Farkle;
 import javax.swing.*;
 
 public class Scoring {
+    /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class handles the scoring for the game.
+     */
 
+    // This is the called to return the Status(VALID_DICE, SCORE)
     public static Status RunningTotal(Dice[] dice){
 
+        // For each dice set the selection of the Dice Objects
         for (Dice die : dice){
             JCheckBox box = die.getCheckbox();
+
             if (box.isSelected())
                 die.setSelected(true);
+
             else
                 die.setSelected(false);
         }
@@ -30,7 +39,7 @@ public class Scoring {
             return new Status(true, total);
     }
 
-
+    // Total up the score for the current dice selected
     private static int countTotal(int[] values) {
         int total = 0;
 
@@ -56,6 +65,8 @@ public class Scoring {
         return total;
     }
 
+    // Checks for invalid selection
+    // (Ex. number of twos, threes, fours, and sixes selected is more than 0 but less than 3)
     private static boolean checkForInvalidSelection(int[] values) {
 
         return (0 < values[1] && values[1] < 3 ||
@@ -64,8 +75,9 @@ public class Scoring {
                 0 < values[5] && values[5] < 3 );
     }
 
-
+    // Check to see if the dice selected are 1, 2, 3, 4, 5, 6
     private static boolean straight(int[] values) {
+
         for (int val : values) {
             if (val != 1)
                 return false;
@@ -73,14 +85,20 @@ public class Scoring {
         return true;
     }
 
+    // Check to see if the user has selected three pairs
     private static boolean threePairs(int[] values) {
         int pairs = 0;
+
         for (int val : values){
+
             if (val == 2)
                 pairs++;
-            if (val == 4)  // Just added
+
+            // This is another if and not if else to evaluate if the user has selected (2, 2, 4, 4, 4, 4)
+            if (val == 4)
                 pairs++;
         }
+
         return (pairs == 3);
     }
 
@@ -99,6 +117,7 @@ public class Scoring {
         return values;
     }
 
+    // Check to see if the dice in play cannot score
     public static boolean checkForFarkle(Dice[] dice){
 
         int[] values = {0,0,0,0,0,0};
@@ -112,6 +131,7 @@ public class Scoring {
         return (values[0] == 0 && values[1] < 3 && values[2] < 3 && values[3] < 3 && values[4] == 0 && values[5] < 3);
     }
 
+    // Check if all dice are selected
     public static boolean allSelected(Dice[] dice){
         for (Dice die : dice){
             if (!die.isSelected())

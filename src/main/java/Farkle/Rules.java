@@ -1,6 +1,12 @@
 package Farkle;
 
 public class Rules {
+    /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class is only used when showing the rules to the user
+     */
+
 
     public static final String rules =
             "To win at Farkle you must be the rist player to score 10,000 points\n" +

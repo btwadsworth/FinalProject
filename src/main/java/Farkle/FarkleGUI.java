@@ -1,9 +1,3 @@
-/**
- * Ben Wadsworth
- * 5/14/2019
- * This is the main class for the program, handling all the gui components and their listeners
- */
-
 package Farkle;
 
 import javax.swing.*;
@@ -14,6 +8,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class FarkleGUI extends JFrame {
+    /**
+     * Ben Wadsworth
+     * 5/14/2019
+     * This is the main class for the program, handling all the gui components and their listeners
+     */
+
     private JPanel mainPanel;
     private JLabel lblPlayerOne;
     private JLabel lblPlayerTwo;
@@ -84,23 +84,21 @@ public class FarkleGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (first_roll_of_turn)
-                {
+                if (first_roll_of_turn) {
                     turn.startOfTurn(dice);  // Sets the dice up for the roll
                     first_roll_of_turn = false;
                     Roll.rollDice(dice, images);
                 }
-                else
-                {
+
+                else {
                     // Can't roll again again without having at least one dice selected
                     if (validation.checkNoneSelected(dice))
                         showMessage("You must keep at least one dice to roll again.");
 
-                    else
-                    {
+                    else {
+
                         // Checks the Status of the selected dice
-                        if (status.isValid_dice())
-                        {
+                        if (status.isValid_dice()) {
                             roll_total += status.getRoll_total();
 
                             // If all dice are selected and valid the program rolls the dice again for you
@@ -108,8 +106,8 @@ public class FarkleGUI extends JFrame {
                                 turn.keepRolling(dice);
                                 Roll.rollDice(dice, images);
                             }
-                            else
-                            {
+
+                            else {
                                 turn.keepDice(dice);
                                 Roll.rollDice(dice, images);
                             }
@@ -120,29 +118,32 @@ public class FarkleGUI extends JFrame {
                 }
 
                 // Immediately Checks if none of the dice rolled can score AKA "FARKLE"
-                if (Scoring.checkForFarkle(dice))
-                {
+                if (Scoring.checkForFarkle(dice)) {
                     showMessage("FARKLE! End of turn");
                     nextTurn();
                 }
+
                 else
                     btnRollDice.setText("Roll Again");
             }
         });
 
         // Bank points ends the rolling players turn, saves their score and changes the active rolling player
-        //   to the other player.  If the user has 10000,
+        //   to the other player.  Once a player scores equal to or more than the WINNING_SCORE, they win
         btnBankPoints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (validation.checkNoneSelected(dice))
                     showMessage("You must select a dice in order to bank your points.");
                 else{
+
                     for (Player player : players){
+
                         if (player.isTurn()){
                             int total = roll_total + status.getRoll_total();
                             player.addToScore(total);
                             player.changeScoreLabel();
+
                             if (player.getScore() >= WINNING_SCORE){
                                 showMessage(player.getName() + " is the Winner!");
                                 farkleDB.dropTable();
@@ -150,10 +151,10 @@ public class FarkleGUI extends JFrame {
                             }
                         }
                     }
+
                     turn.endTurn(dice, images);
                     nextTurn();
                 }
-
             }
         });
 
@@ -162,11 +163,16 @@ public class FarkleGUI extends JFrame {
             box.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    status = Scoring.RunningTotal(dice);
+
+                    status = Scoring.RunningTotal(dice); // Generate the current Status for the dice selected
+
                     int currentTotal = status.getRoll_total();
                     int visibleTotal = currentTotal + roll_total;
                     String total = Integer.toString(visibleTotal);
-                    lblRunningTotal.setText(total);
+
+                    lblRunningTotal.setText(total);  // Display running total
+
+                    // If all dice are selected and scoring, roll again
                     if (Scoring.allSelected(dice) && status.isValid_dice()){
                         showMessage("The dice are hot! Keep 'em rolling!");
                         btnRollDice.doClick();
@@ -178,6 +184,7 @@ public class FarkleGUI extends JFrame {
         btnSaveGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 if (showConfirm("Are you sure you want to save and quit?", "SAVE & QUIT")){
                     farkleDB.saveGame(players);
                     System.exit(0);
@@ -185,13 +192,16 @@ public class FarkleGUI extends JFrame {
             }
         });
 
+        // Show the rules
         btnRules.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 showMessage(Rules.rules);
             }
         });
 
+        // Select all dice
         btnSelectAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -201,6 +211,8 @@ public class FarkleGUI extends JFrame {
             }
         });
 
+        // Triggered when the user tries to close the application
+        // Asks the user if they want to save before closing
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -225,7 +237,9 @@ public class FarkleGUI extends JFrame {
         });
     }
 
+    // Handles when a player banks their points and setup for the next players turn
     private void nextTurn(){
+
         Player.changeTurns(players, lblPlayerRolling);
         turn.endTurn(dice, images);
         first_roll_of_turn = true;
@@ -276,15 +290,18 @@ public class FarkleGUI extends JFrame {
         lblPlayerRolling.setText(players[0].getName());
     }
 
+    // Dialog Box
     private void showMessage(String message){
         JOptionPane.showMessageDialog(this, message);
     }
 
+    // Confirm boc
     private boolean showConfirm(String message, String title) {
         return (JOptionPane.showConfirmDialog(this, message, title,
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
     }
 
+    // Asks if the user wants to load a game or start a new game
     private boolean loadGameConfirm(){
         Object[] options = { "Load Game", "Start New Game" };
         int result = JOptionPane.showOptionDialog(
@@ -297,7 +314,7 @@ public class FarkleGUI extends JFrame {
                         options,
                         null);
 
-        return (result == 0);
+        return (result == JOptionPane.YES_NO_OPTION);
     }
 
 }

@@ -3,7 +3,13 @@ package Farkle;
 import javax.swing.*;
 
 public class Player {
+    /**
+     * Ben Wadsworth
+     * 5/15/2019
+     * This class handles the Player Objects
+     */
 
+    // Declare variables
     private String name;
     private int score;
     private boolean turn;
